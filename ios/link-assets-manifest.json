@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/Sen-Bold.ttf",
+      "sha1": "b7bc27d0ca62766fe67de9c2c607c64e0f4dbef7"
+    },
+    {
+      "path": "assets/fonts/Sen-ExtraBold.ttf",
+      "sha1": "19486580d55146893658081dab883aaf0703ac86"
+    },
+    {
+      "path": "assets/fonts/Sen-Regular.ttf",
+      "sha1": "cfcb5fe099b56b16e49dd86f2bda156b87fa7018"
+    }
+  ]
+}

@@ -1,21 +1,49 @@
 package com.instagram;
 
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.View;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
+import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.ReactPackage;
+import com.facebook.react.ReactRootView;
+import com.facebook.react.common.LifecycleState;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
-
+import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
+import com.facebook.react.shell.MainReactPackage;
+import com.rnfs.RNFSPackage;
 import org.devio.rn.splashscreen.SplashScreen;
 
-public class MainActivity extends ReactActivity {
+import java.util.Arrays;
+import java.util.List;
 
+public class MainActivity extends ReactActivity  {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
 //    SplashScreen.show(this);  // here
     super.onCreate(savedInstanceState);
+    hideNavigationBar();
+
+
   }
+
+
+
+
+  private void hideNavigationBar() {
+    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+  }
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+          super.onConfigurationChanged(newConfig);
+           Intent intent = new Intent("onConfigurationChanged");
+           intent.putExtra("newConfig", newConfig);
+           this.sendBroadcast(intent);
+       }
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule

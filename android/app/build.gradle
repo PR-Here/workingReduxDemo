@@ -1,4 +1,5 @@
 apply plugin: "com.android.application"
+apply plugin: 'com.google.gms.google-services'
 apply plugin: "com.facebook.react"
 
 import com.android.build.OutputFile
@@ -149,12 +150,19 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-immersive-mode')
+    implementation project(':react-native-video')
+    implementation project(path: ":@react-native-firebase_storage")
+    implementation platform('com.google.firebase:firebase-bom:32.1.1')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation project(':react-native-fs')
     implementation project(':react-native-splash-screen')
 
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+    implementation project(path: ':@react-native-camera-roll_camera-roll')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

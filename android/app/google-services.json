@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "812501800500",
+    "project_id": "videoplayer-60b96",
+    "storage_bucket": "videoplayer-60b96.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812501800500:android:33e4c048ec3cc2459a1c61",
+        "android_client_info": {
+          "package_name": "com.instagram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "812501800500-phapugi2ee2ki8kd27o9luchpchd4emp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.instagram",
+            "certificate_hash": "e100c22cab58fbf72fdfa16d45e3addbfc5d50e8"
+          }
+        },
+        {
+          "client_id": "812501800500-557ovjdnjb8c1ue8dqah49johqtnf8j3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbbkuNe9WGNbvifkOwzXWT4F3wBn4gxpg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "812501800500-557ovjdnjb8c1ue8dqah49johqtnf8j3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
