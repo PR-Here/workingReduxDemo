@@ -15,10 +15,14 @@ export const GalleryDataSlice = createSlice({
     getData: (state, action) => {
       state.data = action.payload;
     },
+   
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { addData, getData } = GalleryDataSlice.actions;
+export const {
+  addData,
+  getData,
+} = GalleryDataSlice.actions;
 
 export default GalleryDataSlice.reducer;

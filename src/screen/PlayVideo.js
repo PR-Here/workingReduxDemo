@@ -25,7 +25,9 @@ import Slider from "react-native-slider";
 import { SEN, SEN_BOLD } from "../utils/MyFont";
 import {
   BACK,
+  BACK_ARROW,
   CLOSE,
+  CROP,
   FIT,
   MUTE,
   NEW_PLAY,
@@ -40,19 +42,23 @@ import { getData } from "../redux/slice/GalleryDataSlice";
 import { useSelector, useDispatch } from "react-redux";
 import Lottie from "lottie-react-native";
 import showToast from "../utils/Constant";
-import { saveVideoName } from "../redux/slice/VideoNameSlice";
+import {
+  hideHeader,
+  saveVideoName,
+  showHeader,
+} from "../redux/slice/VideoNameSlice";
 
 const DeviceWidth = Dimensions.get("window").width;
 const DeviceHeight = Dimensions.get("window").height;
 
 export default function PlayVideo({ navigation, route }) {
-  const dispatch= useDispatch();
+  const dispatch = useDispatch();
   const videoRef = React.useRef(null);
   const flatListRef = React.useRef(null);
   const draggableRef = React.useRef(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [resizeMode, setResizeMode] = useState("cover");
+  const [resizeMode, setResizeMode] = useState("contain");
   const [isPlaying, setIsPlaying] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [showControls, setShowControls] = useState(true);
@@ -66,11 +72,12 @@ export default function PlayVideo({ navigation, route }) {
   const animationRef = useRef(null);
   const animationProgress = useRef(new Animated.Value(0));
   const [mute, setMute] = useState(false);
-  const lastTapRef = useRef(0);
+  const [orientation, setOrientation] = useState("PORTRAIT");
   const [lastPressTime, setLastPressTime] = useState(0);
 
   // Redux Data
   const galleryData = useSelector((state) => state.gallery.data);
+  const videoName = useSelector((state) => state?.videoName?.videoName);
 
   useEffect(() => {
     Orientation.addOrientationListener(handleOrientationChange);
@@ -79,17 +86,19 @@ export default function PlayVideo({ navigation, route }) {
     };
   }, [isLandscape]);
 
-  const handleOrientationChange = (orientation) => {
-    console.log(orientation);
-    setIsLandscape(orientation === "LANDSCAPE-LEFT");
-  };
+  useEffect(() => {
+    // Subscribe to device orientation changes
+    Orientation.addOrientationListener(handleOrientationChange);
 
-  const toggleOrientation = () => {
-    if (isLandscape) {
-      Orientation.lockToPortrait();
-    } else {
-      Orientation.lockToLandscape();
-    }
+    // Unsubscribe from device orientation changes when the component is unmounted
+    return () => {
+      Orientation.removeOrientationListener(handleOrientationChange);
+    };
+  }, []);
+
+  const handleOrientationChange = (newOrientation) => {
+    console.log(newOrientation);
+    setOrientation(newOrientation);
   };
 
   useEffect(() => {
@@ -180,15 +189,27 @@ export default function PlayVideo({ navigation, route }) {
     setModalVisible(true);
   };
 
+  const landscapeModeByClick = () => {
+    if (orientation == "PORTRAIT") {
+      Orientation.lockToLandscape();
+    } else if (orientation == "LANDSCAPE-LEFT") {
+      Orientation.lockToPortrait();
+    } else if (orientation == "LANDSCAPE-RIGHT") {
+      Orientation.lockToPortrait();
+    }
+  };
+
   const fitVideoSize = () => {
-    // if (resizeMode == "contain") {
-    //   setResizeMode("cover");
-    // } else if (resizeMode == "cover") {
-    //   setResizeMode("stretch");
-    // } else {
-    //   setResizeMode("contain");
-    // }
-    toggleOrientation();
+    if (resizeMode == "contain") {
+      showToast("FIT");
+      setResizeMode("cover");
+    } else if (resizeMode == "cover") {
+      showToast("STRETCH");
+      setResizeMode("stretch");
+    } else {
+      showToast("ORIGINAL");
+      setResizeMode("contain");
+    }
   };
 
   const skipForward = () => {
@@ -229,20 +250,8 @@ export default function PlayVideo({ navigation, route }) {
   };
 
   const handleSound = () => {
+    showToast(!mute ? "Mute" : "Sound");
     setMute(!mute);
-  };
-
-  const handleDoubleClick = (side) => {
-    const currentTime = new Date().getTime();
-    const DOUBLE_PRESS_DELAY = 300; // Adjust this value as per your requirements
-
-    if (currentTime - lastPressTime < DOUBLE_PRESS_DELAY) {
-      // Double-click action
-      setIsPlaying((prevState) => !prevState);
-    } else {
-      // Single click
-      setLastPressTime(currentTime);
-    }
   };
 
   return (
@@ -255,6 +264,7 @@ export default function PlayVideo({ navigation, route }) {
         flex: 1,
         backgroundColor: "white",
         position: "relative",
+        // backgroundColor:'red'
       }}
     >
       {/* Video */}
@@ -262,7 +272,7 @@ export default function PlayVideo({ navigation, route }) {
         ref={videoRef}
         source={{ uri: videoUri }}
         paused={isPlaying}
-        style={{ width: DeviceWidth, height: DeviceHeight }}
+        style={{ width: "100%", height: "100%" }}
         repeat={repeat}
         resizeMode={resizeMode}
         ignoreSilentSwitch="ignore"
@@ -296,15 +306,25 @@ export default function PlayVideo({ navigation, route }) {
             },
           ]}
         >
+          {/* BACK BUTTON */}
+          <View style={styles.backButton}>
+            <TouchableOpacity
+              style={styles.backImage}
+              onPress={() => navigation.goBack()}
+            >
+              <Image style={{ width: 30, height: 30 }} source={BACK_ARROW} />
+            </TouchableOpacity>
+            <Text style={styles.videoNameText}>{videoName}</Text>
+          </View>
           {/* Slider View */}
           <View style={styles.sliderView}>
-            {/* Volume Slider */}
-
             {/* Start Time Text */}
-            <Text style={styles.timeText}>{formatPlayTime(currentTime)}</Text>
+            <Text style={styles.timeText}>
+              {formatPlayTime(currentTime)}/{formatDuration(duration)}
+            </Text>
             {/* Slider */}
             <Slider
-              style={{ width: "50%", marginLeft: 30 }}
+              style={{ width: "50%", marginLeft: 10 }}
               minimumValue={0}
               maximumValue={duration == 0 ? duration : duration - 1}
               value={currentTime}
@@ -313,10 +333,6 @@ export default function PlayVideo({ navigation, route }) {
               minimumTrackTintColor="green"
               maximumTrackTintColor="#808080"
             />
-            {/* Total time */}
-            <Text style={[styles.timeText, { marginLeft: 30 }]}>
-              {formatDuration(duration)}
-            </Text>
           </View>
           {/* Control View */}
           <View style={styles.buttonControlView}>
@@ -324,6 +340,17 @@ export default function PlayVideo({ navigation, route }) {
             <TouchableOpacity style={styles.playButton} onPress={skipBackward}>
               <Image
                 source={BACK}
+                style={{ width: 20, height: 20, tintColor: "green" }}
+              />
+            </TouchableOpacity>
+
+            {/* NEXT */}
+            <TouchableOpacity
+              style={[styles.playButton, { marginLeft: 20 }]}
+              onPress={skipForward}
+            >
+              <Image
+                source={NEXT}
                 style={{ width: 20, height: 20, tintColor: "green" }}
               />
             </TouchableOpacity>
@@ -337,26 +364,6 @@ export default function PlayVideo({ navigation, route }) {
                 style={{ width: 20, height: 20, tintColor: "green" }}
               />
             </TouchableOpacity>
-            {/* NEXT */}
-            <TouchableOpacity
-              style={[styles.playButton, { marginLeft: 20 }]}
-              onPress={skipForward}
-            >
-              <Image
-                source={NEXT}
-                style={{ width: 20, height: 20, tintColor: "green" }}
-              />
-            </TouchableOpacity>
-            {/* Resize */}
-            <TouchableOpacity
-              style={[styles.playButton, { marginLeft: 20 }]}
-              onPress={fitVideoSize}
-            >
-              <Image
-                source={FIT}
-                style={{ width: 20, height: 20, tintColor: "green" }}
-              />
-            </TouchableOpacity>
             {/* Sound */}
             <TouchableOpacity
               style={[styles.playButton, { marginLeft: 20 }]}
@@ -367,6 +374,29 @@ export default function PlayVideo({ navigation, route }) {
                 style={{ width: 20, height: 20, tintColor: "green" }}
               />
             </TouchableOpacity>
+            {/* Landscape Mode */}
+            <TouchableOpacity
+              style={[styles.playButton, { marginLeft: 20 }]}
+              onPress={landscapeModeByClick}
+            >
+              <Image
+                source={FIT}
+                style={{ width: 20, height: 20, tintColor: "green" }}
+              />
+            </TouchableOpacity>
+            {/* Resize */}
+            {/* {orientation == "LANDSCAPE-LEFT" ||
+            orientation == "LANDSCAPE-RIGHT" ? ( */}
+            <TouchableOpacity
+              style={[styles.playButton, { marginLeft: 20 }]}
+              onPress={fitVideoSize}
+            >
+              <Image
+                source={CROP}
+                style={{ width: 20, height: 20, tintColor: "green" }}
+              />
+            </TouchableOpacity>
+            {/* ) : null} */}
           </View>
           {/* Drag Button */}
           <Draggable
@@ -399,12 +429,7 @@ export default function PlayVideo({ navigation, route }) {
       {modalVisible ? (
         <TouchableOpacity
           activeOpacity={1}
-          style={[
-            styles.bottomPopupView,
-            {
-              transform: [],
-            },
-          ]}
+          style={[styles.bottomPopupView, {}]}
         >
           <TouchableOpacity
             onPress={() => {
@@ -453,7 +478,7 @@ export default function PlayVideo({ navigation, route }) {
                     elevation: 5,
                   }}
                   onPress={() => {
-                    dispatch(saveVideoName(item?.extension))
+                    dispatch(saveVideoName(item?.extension));
                     memoizedOnPress(false, item?.node?.image?.uri, index);
                   }}
                 >
@@ -490,7 +515,6 @@ var styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     alignItems: "center",
-    // backgroundColor: "red",
     alignContent: "center",
     flexWrap: "wrap",
   },
@@ -535,7 +559,6 @@ var styles = StyleSheet.create({
   bottomPopupView: {
     position: "absolute",
     backgroundColor: "#00000099",
-    height: "30%",
     justifyContent: "flex-end",
     alignSelf: "flex-end",
     alignItems: "flex-end",
@@ -577,5 +600,25 @@ var styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
+  },
+  backButton: {
+    position: "absolute",
+    top: 10,
+    left: 20,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  backImage: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  videoNameText: {
+    fontFamily: SEN,
+    marginLeft: 20,
+    fontSize: 14,
+    color: "black",
   },
 });

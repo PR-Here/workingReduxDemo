@@ -4,6 +4,7 @@ export const VideoNameSlice = createSlice({
   name: "videoNameSlice",
   initialState: {
     videoName: "Video Player",
+    showHeader: false,
   },
   reducers: {
     saveVideoName: (state, action) => {
@@ -12,8 +13,19 @@ export const VideoNameSlice = createSlice({
     getVideoName: (state, action) => {
       state.videoName = action.payload;
     },
+    showHeader: (state) => {
+      state.showHeader = true;
+    },
+    hideHeader: (state) => {
+      state.showHeader = false;
+    },
   },
 });
 
-export const { saveVideoName, getVideoName } = VideoNameSlice.actions;
+export const {
+  saveVideoName,
+  getVideoName,
+  showHeader,
+  hideHeader,
+} = VideoNameSlice.actions;
 export default VideoNameSlice.reducer;

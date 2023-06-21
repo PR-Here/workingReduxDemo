@@ -199,7 +199,7 @@ export default function VideoPlayer({ navigation }) {
         key={index}
         style={styles.videoView}
         onPress={() => {
-          dispatch(saveVideoName(item?.extension));
+          dispatch(saveVideoName(`${item?.extension}`));
           navigation.navigate("playVideo", {
             videoUri: item?.node?.image?.uri,
           });

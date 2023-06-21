@@ -13,3 +13,5 @@ export const CLOSE = require("../../assets/image/close.png");
 export const SOUND = require("../../assets/image/volume.png");
 export const MUTE = require("../../assets/image/mute.png");
 export const LOGO = require("../../assets/image/logo.png");
+export const CROP = require("../../assets/image/crop.png");
+export const BACK_ARROW = require("../../assets/image/back.png");
