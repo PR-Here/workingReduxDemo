@@ -12,9 +12,11 @@
   },
   "dependencies": {
     "@bam.tech/react-native-image-resizer": "^3.0.5",
+    "@openspacelabs/react-native-zoomable-view": "^2.1.1",
     "@react-native-camera-roll/camera-roll": "^5.6.0",
     "@react-native-firebase/app": "^18.0.0",
     "@react-native-firebase/storage": "^18.0.0",
+    "@react-native-google-signin/google-signin": "^10.0.1",
     "@react-navigation/material-bottom-tabs": "^6.2.15",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
@@ -30,6 +32,7 @@
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.12.0",
     "react-native-image-picker": "^5.4.2",
+    "react-native-immersive": "^2.0.0",
     "react-native-immersive-mode": "^2.0.0",
     "react-native-media-library": "^0.0.1",
     "react-native-orientation-locker": "^1.5.0",
@@ -41,12 +44,15 @@
     "react-native-splash-screen": "^3.3.0",
     "react-native-svg": "^13.9.0",
     "react-native-svg-transformer": "^1.0.0",
+    "react-native-switch": "^1.5.1",
+    "react-native-theoplayer": "^2.9.0",
     "react-native-toast-message": "^2.1.6",
     "react-native-vector-icons": "^9.2.0",
     "react-native-video": "^5.2.1",
     "react-native-video-player": "^0.14.0",
     "react-redux": "^8.1.0",
-    "redux": "^4.2.1"
+    "redux": "^4.2.1",
+    "use-double-click": "^1.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -10,6 +10,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
+import com.rnimmersive.RNImmersivePackage;
 import com.rnimmersivemode.RNImmersiveModePackage;
 
 import org.wonday.orientation.OrientationActivityLifecycle;
@@ -38,6 +39,7 @@ public class MainApplication extends Application implements ReactApplication {
                     new ReactVideoPackage();
                     new RNImmersiveModePackage();
                     new OrientationPackage();
+                    new RNImmersivePackage();
                     return packages;
                 }
 

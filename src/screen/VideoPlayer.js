@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   FlatList,
@@ -12,6 +12,7 @@ import {
   Linking,
   TouchableWithoutFeedback,
   TouchableOpacity,
+  ImageBackground,
 } from "react-native";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import storage from "@react-native-firebase/storage";
@@ -27,14 +28,20 @@ import { err } from "react-native-svg/lib/typescript/xml";
 import { SEN, SEN_BOLD } from "../utils/MyFont";
 import { addData } from "../redux/slice/GalleryDataSlice";
 import { useSelector, useDispatch } from "react-redux";
-import { saveVideoName } from "../redux/slice/VideoNameSlice";
+import {
+  saveVideoName,
+  doubleClick,
+  singleClick,
+} from "../redux/slice/VideoNameSlice";
+import { PLAY } from "../utils/MyImage";
 
 var uploadedRefs;
 
 export default function VideoPlayer({ navigation }) {
+  const doubleClickTimeoutRef = useRef();
   const [galleryItems, setGalleryItems] = useState([]);
   const [deviceName, setDeviceName] = useState("");
-  const [progressValue, setProgressValue] = useState(0);
+  const [timer, setTimer] = useState(null);
   const [video, setVideo] = useState([]);
   const dispatch = useDispatch();
 
@@ -191,6 +198,33 @@ export default function VideoPlayer({ navigation }) {
     }
   };
 
+  const handleSingleClick = () => {};
+
+  const handleDoubleClick = () => {
+    dispatch(doubleClick());
+    navigation.navigate("setting");
+    setTimeout(() => {
+      dispatch(singleClick());
+    }, 4000);
+  };
+
+  const handlePress = () => {
+    if (doubleClickTimeoutRef.current) {
+      // Double click occurred
+      clearTimeout(doubleClickTimeoutRef.current);
+      doubleClickTimeoutRef.current = null;
+      handleDoubleClick();
+    } else {
+      // Single click occurred
+      doubleClickTimeoutRef.current = setTimeout(() => {
+        doubleClickTimeoutRef.current = null;
+        handleSingleClick();
+      }, 300); // Adjust the delay to determine the maximum time between clicks for double click
+    }
+  };
+
+  const handleLongPress = () => {};
+
   const renderItem = ({ item, index }) => {
     // console.log(item);
     return (
@@ -205,10 +239,21 @@ export default function VideoPlayer({ navigation }) {
           });
         }}
       >
-        <Image
+        <ImageBackground
+          borderRadius={5}
           source={{ uri: item?.node?.image?.uri }}
-          style={{ width: 100, height: 100, borderRadius: 100 / 4 }}
-        />
+          style={{
+            width: 100,
+            height: 100,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Image
+            style={{ width: 20, height: 20, tintColor: "#d3d3d3d3" }}
+            source={PLAY}
+          />
+        </ImageBackground>
         <View style={styles.nameView}>
           {/* Name */}
           <View style={styles.textView}>
@@ -220,12 +265,11 @@ export default function VideoPlayer({ navigation }) {
           </View>
           {/* Location */}
           <View style={styles.textView}>
-            <Text style={styles.text}>File Location</Text>
+            <Text style={styles.text}>File Folder</Text>
             <Text style={{ color: "black" }}>:</Text>
             <Text style={styles.textValue}> {item?.node?.group_name}</Text>
           </View>
           {/* Size */}
-
           <View style={styles.textView}>
             <Text style={styles.text}>Video Size</Text>
             <Text style={{ color: "black" }}>:</Text>
@@ -234,6 +278,13 @@ export default function VideoPlayer({ navigation }) {
             </Text>
           </View>
         </View>
+        {/* DOUBLE CLICK VIEW */}
+        <TouchableOpacity
+          onPress={handlePress}
+          onLongPress={handleLongPress}
+          activeOpacity={1}
+          style={styles.doubleClickView}
+        ></TouchableOpacity>
       </TouchableOpacity>
     );
   };
@@ -271,12 +322,21 @@ const styles = StyleSheet.create({
   textValue: {
     fontFamily: SEN_BOLD,
     color: "black",
-    marginTop: 5,
     width: 120,
     marginLeft: 10,
   },
   textView: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    margin: 5,
+  },
+  doubleClickView: {
+    position: "absolute",
+    width: 100,
+    height: 20,
+    backgroundColor: "transparent",
+    top: 0,
+    right: 0,
   },
 });

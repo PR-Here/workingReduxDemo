@@ -6,6 +6,7 @@ import BottomNavigation from "../bottom_navigation/BottmNavigation";
 import PlayVideo from "../screen/PlayVideo";
 import { SEN_BOLD } from "../utils/MyFont";
 import { useSelector } from "react-redux";
+import ImagePreview from "../screen/ImagePreview";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,12 +32,13 @@ export default function StackNavigation() {
             backgroundColor: "#d3d3d3d3",
           },
         }}
-        initialRouteName="welcome"
+        initialRouteName="image"
       >
         <Stack.Screen name="bottom" component={BottomNavigation} options={{
           headerShown:true
         }} />
         <Stack.Screen name="playVideo" component={PlayVideo} />
+        <Stack.Screen name="image" component={ImagePreview} />
       </Stack.Navigator>
     </NavigationContainer>
   );

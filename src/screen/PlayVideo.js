@@ -47,6 +47,8 @@ import {
   saveVideoName,
   showHeader,
 } from "../redux/slice/VideoNameSlice";
+import Immersive from "react-native-immersive";
+import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 
 const DeviceWidth = Dimensions.get("window").width;
 const DeviceHeight = Dimensions.get("window").height;
@@ -70,10 +72,11 @@ export default function PlayVideo({ navigation, route }) {
   const [scale, setScale] = useState(1);
   const [myIndex, setIndex] = useState(null);
   const animationRef = useRef(null);
+  const zoomableViewRef = useRef(null);
   const animationProgress = useRef(new Animated.Value(0));
   const [mute, setMute] = useState(false);
   const [orientation, setOrientation] = useState("PORTRAIT");
-  const [lastPressTime, setLastPressTime] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   // Redux Data
   const galleryData = useSelector((state) => state.gallery.data);
@@ -253,41 +256,61 @@ export default function PlayVideo({ navigation, route }) {
     showToast(!mute ? "Mute" : "Sound");
     setMute(!mute);
   };
+  const hideNavigationButton = () => {
+    Immersive.on();
+  };
 
   return (
     <TouchableOpacity
       activeOpacity={1}
       onPress={() => {
+        hideNavigationButton();
         setShowControls(!showControls);
       }}
       style={{
         flex: 1,
         backgroundColor: "white",
         position: "relative",
-        // backgroundColor:'red'
       }}
     >
       {/* Video */}
-      <Video
-        ref={videoRef}
-        source={{ uri: videoUri }}
-        paused={isPlaying}
-        style={{ width: "100%", height: "100%" }}
-        repeat={repeat}
-        resizeMode={resizeMode}
-        ignoreSilentSwitch="ignore"
-        playInBackground={true}
-        fullscreenAutorotate={true}
-        muted={mute}
-        onLoad={() => console.log("Video loaded")}
-        onError={(error) => console.log("Video error:", error)}
-        onProgress={onProgress}
-        onFullscreenPlayerWillPresent={() =>
-          console.log("Entering full screen")
-        }
-        onFullscreenPlayerDidDismiss={() => console.log("Exiting full screen")}
-        onEnd={onVideoEnd}
-      />
+      <ReactNativeZoomableView
+        ref={zoomableViewRef}
+        maxZoom={30}
+        minZoom={0.5}
+        zoomStep={0.5}
+        initialZoom={1}
+        bindToBorders={true}
+        doubleTapZoomToCenter={true}
+        style={{
+          padding: 10,
+          flex: 1,
+        }}
+        onSingleTap={() => setShowControls(!showControls)}
+      >
+        <Video
+          ref={videoRef}
+          source={{ uri: videoUri }}
+          paused={isPlaying}
+          style={{ width: "100%", height: "100%" }}
+          repeat={repeat}
+          resizeMode={resizeMode}
+          ignoreSilentSwitch="ignore"
+          playInBackground={true}
+          fullscreenAutorotate={true}
+          muted={mute}
+          onLoad={() => console.log("Video loaded")}
+          onError={(error) => console.log("Video error:", error)}
+          onProgress={onProgress}
+          onFullscreenPlayerWillPresent={() =>
+            console.log("Entering full screen")
+          }
+          onFullscreenPlayerDidDismiss={() =>
+            console.log("Exiting full screen")
+          }
+          onEnd={onVideoEnd}
+        />
+      </ReactNativeZoomableView>
       {showControls && (
         <TouchableOpacity
           onPress={() => setShowControls(!showControls)}
@@ -312,7 +335,10 @@ export default function PlayVideo({ navigation, route }) {
               style={styles.backImage}
               onPress={() => navigation.goBack()}
             >
-              <Image style={{ width: 30, height: 30 }} source={BACK_ARROW} />
+              <Image
+                style={{ width: 30, height: 30, tintColor: "green" }}
+                source={BACK_ARROW}
+              />
             </TouchableOpacity>
             <Text style={styles.videoNameText}>{videoName}</Text>
           </View>
